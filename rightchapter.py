@@ -15,6 +15,7 @@ stt_button.js_on_event("button_click", CustomJS(args=dict(timer_display=timer_di
     recognition.interimResults = true;
 
     var timeLeft = 120;
+    var finalTranscript = '';
     var timerInterval = setInterval(function() {
         timeLeft--;
         timer_display.text = 'Timer: ' + timeLeft;
@@ -25,15 +26,15 @@ stt_button.js_on_event("button_click", CustomJS(args=dict(timer_display=timer_di
     }, 1000);
     
     recognition.onresult = function (e) {
-        var value = "";
+        var interimTranscript = '';
         for (var i = e.resultIndex; i < e.results.length; ++i) {
             if (e.results[i].isFinal) {
-                value += e.results[i][0].transcript;
+                finalTranscript += e.results[i][0].transcript;
+            } else {
+                interimTranscript += e.results[i][0].transcript;
             }
         }
-        if ( value != "") {
-            document.dispatchEvent(new CustomEvent("GET_TEXT", {detail: value}));
-        }
+        document.dispatchEvent(new CustomEvent("GET_TEXT", {detail: finalTranscript + interimTranscript}));
     }
 
     recognition.start();
